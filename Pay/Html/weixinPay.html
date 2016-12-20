@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>微信充值</title>
+    <style type="text/css">
+        body {font-family: '微软雅黑'; background-color: #f7f7f7;}
+        *{margin: 0; padding: 0;}
+        #pay-header {
+            height: 70px;
+            background: #fff;
+            border-bottom: solid #e9e9e9 1px;
+            box-shadow: 0 2px 2px #f2f2f2; }
+        .pay-head {    width: 1002px; margin: 0 auto auto; height: 70px; position: relative;}
+        .pay-head .pay-logo {    position: absolute;  top: 13px; left: 3px;}
+        .pay-head .pay-tt {position: absolute; top: 19px;left: 126px; font-size: 19px;  border-left: solid #e1e1e1 1px; height: 33px; padding-left: 17px; line-height: 32px;}
+        #container {width: 1002px; margin: 0 auto;}
+        .pay-user-name {margin: 15px 0;}
+        .pay-user-name h3 span{ font-size: 14px; font-weight: 300; margin-left: 10px; color: #666;}
+        #pay-main {position: relative; background-color: #fff; border: 1px solid #f8f8f8; border-top: 3px solid #f09; text-align: center; padding: 60px 0;}
+        .wxin-goback {position: absolute; right: 30px; top: 15px;background: url(images/pay_06.png) no-repeat left center; padding-left: 20px;}
+        .wxin-goback a { color: #666; font-size: 12px;}
+        .wxin-tit {font-size: 22px; line-height: 50px;}
+        .w-tip { margin: 15px 0 30px 15px; background: url(images/pay_04.png) no-repeat 370px center; color: #666;}
+        .w-tim{position: absolute; right: 150px; top: 80px;}
+        .wxin-djs {font-size: 12px; color: #666; position: absolute; left: 20px; top: 25px;}
+        .wxin-djs span {color: red;padding: 0 3px;}
+    </style>
+</head>
+<body>
+<div id="pay-header">
+    <div class="pay-head">
+        <!--<div class="pay-logo">-->
+            <!--<a href="#"><img src="<?php echo '/Public/img/logo.png'; ?>" alt="" /></a>-->
+        <!--</div>-->
+        <span class="pay-tt">充值中心</span>
+    </div>
+</div>
+<div id="container">
+    <div class="pay-user-name">
+
+        <h3>充值:<?php echo $data['ramount'] ?>元<span>收款方：万万娱乐</span></h3>
+    </div>
+    <div id="pay-main" class="clearfix">
+        <div class="pay-right">
+            <div class="pay-wxin">
+                <div class="wxin-djs">
+                    <p id="wxin-time">距离二维码过期还剩<span id="did">600</span>秒，过期后请刷新页面重新获取二维码。</p>
+                </div>
+                <div class="wxin-goback">
+                    <a href="http://www.wanwanyl.com/Mall/charge">返回</a>
+                </div>
+                <p class="wxin-tit">
+                    微信扫码支付
+                </p>
+                <p class="wxin-ewm" id="qrcode">
+                    <img width="200px" height="200px" src="<?php echo $data['url'] ?>"/>
+                </p>
+                <p class="w-tip">打开微信手机客户端扫一扫</p>
+                <p class="w-tim">
+                    <!--<img src="/Public/img/img4.png">-->
+                </p>
+                <table class="wxin-table" width="394" border="0" style="margin: 0 auto;" cellpadding="0" cellspacing="1" bgcolor="#dfdfdf">
+                    <tr>
+                        <td width="125" height="44" bgcolor="#fbfbfb" >交易金额</td>
+                        <td width="266" height="44" bgcolor="#ffffff" ><font color="#ff7700"><strong><?php echo $data['ramount'] ?>元</strong></font></td>
+                    </tr>
+                    <tr>
+                        <td width="125" height="44" bgcolor="#fbfbfb">支付方式</td>
+                        <td width="266" height="44" bgcolor="#ffffff"><font color="#ff7700"><strong>微信支付</strong></font></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" <?php echo 'src="'.C('SERVICE_RESOURCE').'/js/jquery-1.8.3.min.js"'; ?> ></script>
+<script type="text/javascript">
+    $(function(){
+        var number = "<?php echo $data['number']; ?>";
+        var orderid = "<?php echo $data['id']; ?>";
+        var m=600;
+        var mytime = window.setInterval(function(){
+            m--;
+            //innerHTML取到的是获取的div的文本值
+            document.getElementById("did").innerHTML = m;
+            if (m==0) {
+                var text=document.getElementById("wxin-time");
+                text.innerHTML=("<p>二维码已过期，"+"<a href='javascript:window.location.reload();'>刷新<a>"+"页面重新获取二维码。</p>");
+                //停止执行
+                window.clearInterval(mytime);
+            }else{
+                //查询订单是否完成
+                $.post('/Pay/wxOrderQuery',{'orderid':orderid,'number':number},function(date){
+                    if(date.state){
+                        //订单支付成功 跳转
+                        window.location = "<?php echo 'http://www.wanwanyl.com/Mall/charge/type/success/rand/'.rand(100,10000); ?>";
+                    }
+                },'json');
+            }
+        },1000);
+    })
+</script>
+
+</body>
+</html>
